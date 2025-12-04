@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Uniview Uae",
+  title: "Uniview UAE",
   description: "UNV Authorised Distributor-UAE| +971509982727",
 };
 

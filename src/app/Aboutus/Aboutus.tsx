@@ -1,6 +1,7 @@
 'use client'
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   Shield,
@@ -18,7 +19,6 @@ import Aboutus from '@/assets/images/banner/Aboutus.jpg';
 import mobileBanner from '@/assets/images/banner/AboutMobile.jpg';
 import Ourmission from '@/assets/images/remain/Ourmission.jpg';
 import OurmissionMobile from '@/assets/images/remain/OurmissionMobile.jpg';
-
 
 const heroVariants = {
   hidden: {
@@ -288,10 +288,10 @@ const AboutUsPage: React.FC = () => {
                     <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full"></div>
                     <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
                   </div>
-                  <button className="text-xs font-medium text-[#3b82f6] hover:text-[#2563eb] group-hover:font-semibold transition-all duration-300 flex items-center">
-                    Learn more
-                    <ArrowRight className="ml-1.5 w-4 h-4 group-hover:ml-2.5 transition-all duration-300" />
-                  </button>
+                  {/* <button className="text-xs font-medium text-[#3b82f6] hover:text-[#2563eb] group-hover:font-semibold transition-all duration-300 flex items-center"> */}
+                    {/* Learn more */}
+                    {/* <ArrowRight className="ml-1.5 w-4 h-4 group-hover:ml-2.5 transition-all duration-300" /> */}
+                  {/* </button> */}
                 </div>
               </div>
             ))}
@@ -335,12 +335,18 @@ const AboutUsPage: React.FC = () => {
             Let&apos;s collaborate to bring cutting-edge technology solutions to your organization. We&apos;re excited to discuss your project requirements.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-[#0560f5] px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+            <Link 
+              href="/Contactus" 
+              className="bg-white text-[#0560f5] px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+            >
               Get Started <ArrowRight className="w-5 h-5" />
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-[#0560f5] transition-all duration-300">
+            </Link>
+            <Link 
+              href="/Solutions" 
+              className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-[#0560f5] transition-all duration-300"
+            >
               Learn More
-            </button>
+            </Link>
           </div>
         </div>
       </section>

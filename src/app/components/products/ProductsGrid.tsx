@@ -31,14 +31,6 @@ interface ProductsGridProps {
 // Constants
 const PRODUCTS_PER_PAGE = 8;
 
-// Fixed rating - 4.7 but don't show the text
-const getRating = () => 4.7;
-
-// Check if product is new
-const isNewProduct = (date: string) => {
-  return new Date(date) > new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
-};
-
 // Optimized Pagination Component
 const Pagination = memo(({ 
   currentPage, 
@@ -236,48 +228,6 @@ const SearchComponent = memo(({ value, onChange }: {
 
 SearchComponent.displayName = 'SearchComponent';
 
-// Star Rating Component for Products Grid
-const ProductStarRating = memo(({ rating }: { rating: number }) => (
-  <div className="flex">
-    {Array.from({ length: 5 }).map((_, i) => {
-      const starValue = i + 1;
-      const isHalfStar = rating >= starValue - 0.5 && rating < starValue;
-      const isFullStar = rating >= starValue;
-
-      return (
-        <motion.span
-          key={i}
-          className={`text-2xl ${
-            isFullStar
-              ? "text-yellow-500"
-              : isHalfStar
-                ? "text-gray-300 relative"
-                : "text-gray-300"
-          }`}
-          whileHover={{ scale: 1.3, rotate: 10 }}
-          transition={{ duration: 0.3 }}
-        >
-          {isHalfStar ? (
-            <span className="relative">
-              ★
-              <span
-                className="absolute top-0 left-0 overflow-hidden text-yellow-500"
-                style={{ width: "50%" }}
-              >
-                ★
-              </span>
-            </span>
-          ) : (
-            "★"
-          )}
-        </motion.span>
-      );
-    })}
-  </div>
-));
-
-ProductStarRating.displayName = 'ProductStarRating';
-
 // Product Card Component with individual in-view detection
 const ProductCard = memo(({ 
   product, 
@@ -294,9 +244,6 @@ const ProductCard = memo(({
     margin: "0px 0px -50px 0px",
   });
 
-  const rating = getRating();
-  const productDate = product.data?.date || new Date().toISOString();
-  const isNew = isNewProduct(productDate);
   const productKey = product.id ?? product._id ?? product.slug ?? index;
 
   return (
@@ -338,23 +285,6 @@ const ProductCard = memo(({
                 <Package className="h-12 w-12 text-gray-400" />
               </div>
             )}
-
-            {/* Show NEW badge only for recent products */}
-            {isNew && (
-              <motion.div 
-                className="absolute top-3 right-3 bg-gradient-to-r from-[#0560f5] to-[#3b82f6] text-white text-xs font-bold px-3 py-1 rounded-lg shadow-lg"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 300, 
-                  damping: 15,
-                  delay: 0.2 + index * 0.1
-                }}
-              >
-                NEW
-              </motion.div>
-            )}
           </div>
         </div>
 
@@ -367,11 +297,6 @@ const ProductCard = memo(({
           >
             {product.name}
           </motion.h3>
-          
-          {/* Display Rating with Half-Star Support - Only stars, no text */}
-          <div className="flex items-center mb-4">
-            <ProductStarRating rating={rating} />
-          </div>
           
           {/* View Details Button */}
           <div className="flex items-center justify-end border-t border-gray-100 pt-4">

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Globe, Shield, Zap, Eye, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function UniviewCards() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
@@ -173,23 +174,23 @@ export default function UniviewCards() {
         className="text-center mt-16"
       >
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full transform transition-all duration-500 ease-out shadow-xl hover:shadow-2xl relative overflow-hidden">
+          <Link href="/Solutions" className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full transform transition-all duration-500 ease-out shadow-xl hover:shadow-2xl relative overflow-hidden">
             <span className="relative z-10 flex items-center gap-2">
               <Eye className="w-5 h-5 transform transition-transform duration-500 ease-out group-hover:scale-125" />
               Explore Solutions
             </span>
             {/* Button shine effect */}
             <div className="absolute inset-0 w-full h-full bg-white opacity-0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-          </button>
+          </Link>
           
-          <button className="group px-8 py-4 border-2 border-blue-600 text-blue-700 font-bold rounded-full transform transition-all duration-500 ease-out shadow-lg hover:shadow-xl relative overflow-hidden">
+          <Link href="/Contactus" className="group px-8 py-4 border-2 border-blue-600 text-blue-700 font-bold rounded-full transform transition-all duration-500 ease-out shadow-lg hover:shadow-xl relative overflow-hidden">
             <span className="relative z-10 flex items-center gap-2">
               <Clock className="w-5 h-5 transform transition-transform duration-500 ease-out group-hover:rotate-12" />
               Contact Us
             </span>
             {/* Button background fill effect */}
             <div className="absolute inset-0 w-0 h-full bg-blue-50 transition-all duration-500 ease-out group-hover:w-full" />
-          </button>
+          </Link>
         </div>
       </motion.div>
     </div>
