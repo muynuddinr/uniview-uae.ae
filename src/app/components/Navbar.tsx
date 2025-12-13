@@ -262,7 +262,7 @@ const Navbar = () => {
                 >
                   <div className="bg-white rounded-lg p-1.5 border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-md h-11 flex items-center justify-center">
                     <div className="w-full">
-                      <h4 className="text-[10px] font-semibold text-gray-600 hover:text-blue-600 transition-colors duration-300 leading-tight">
+                      <h4 className="text-[13px] font-semibold text-gray-600 hover:text-blue-600 transition-colors duration-300 leading-tight">
                         {category.name}
                       </h4>
                     </div>
@@ -313,7 +313,7 @@ const Navbar = () => {
               >
                 <div className="bg-white rounded-lg p-1.5 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-300 h-11 flex items-center justify-center">
                   <div className="w-full">
-                    <h4 className="text-[10px] font-semibold text-gray-600 hover:text-blue-600 transition-colors duration-300">
+                    <h4 className="text-[13px] font-semibold text-gray-600 hover:text-blue-600 transition-colors duration-300">
                       {solution.name}
                     </h4>
                   </div>
