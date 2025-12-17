@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Admin from '@/models/Admin';
-import { verifyToken } from '@/lib/auth';
+import { verifyAdminAuth } from '@/lib/apiAuth';
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await verifyAdminAuth(request);
+    if (!auth.isValid) {
+      return auth.response;
+    }
+    
     await connectDB();
-    
-    const token = request.cookies.get('auth-token')?.value;
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
     
     const admins = await Admin.find({}).select('-password').sort({ createdAt: -1 });
     

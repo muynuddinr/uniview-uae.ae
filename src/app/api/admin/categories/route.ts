@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Category from '@/models/Category';
 import Subcategory from '@/models/Subcategory';
-import { verifyToken, getTokenCookie } from '@/lib/auth';
+import { verifyAdminAuth } from '@/lib/apiAuth';
 import { uploadImage } from '@/lib/cloudinary';
 
 // GET: Public - Fetch all categories with subcategories
@@ -44,20 +44,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication for admin operations
-    const token = getTokenCookie(request);
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid token' },
-        { status: 401 }
-      );
+    const auth = await verifyAdminAuth(request);
+    if (!auth.isValid) {
+      return auth.response;
     }
     
     await connectDB();

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Users, Trash2, RefreshCw, CheckCircle, XCircle, Mail, Eye } from 'lucide-react';
+import { Users, Trash2, RefreshCw, CheckCircle, XCircle, Mail, Eye, ArrowLeft, Calendar } from 'lucide-react';
 import { NewsletterSubscription } from '@/types/newsletter';
 
 const NewsletterPage: React.FC = () => {
@@ -11,6 +10,9 @@ const NewsletterPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [viewingDetail, setViewingDetail] = useState(false);
+  const [selectedSubscription, setSelectedSubscription] = useState<NewsletterSubscription | null>(null);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     fetchSubscriptions();
@@ -37,6 +39,51 @@ const NewsletterPage: React.FC = () => {
     }
   };
 
+  const handleViewDetail = (subscription: NewsletterSubscription) => {
+    setSelectedSubscription(subscription);
+    setViewingDetail(true);
+  };
+
+  const handleCancelDetail = () => {
+    setViewingDetail(false);
+    setSelectedSubscription(null);
+    setError('');
+    setSuccess('');
+  };
+
+  const updateStatus = async (status: 'active' | 'inactive') => {
+    if (!selectedSubscription) return;
+
+    setUpdating(true);
+    try {
+      const response = await fetch(`/api/admin/newsletter/${selectedSubscription.slug}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status }),
+      });
+
+      if (response.ok) {
+        const updatedSubscription = { ...selectedSubscription, status };
+        setSelectedSubscription(updatedSubscription);
+        setSubscriptions(subscriptions.map(sub => 
+          sub.slug === selectedSubscription.slug ? updatedSubscription : sub
+        ));
+        setSuccess(`Subscription ${status === 'active' ? 'activated' : 'deactivated'}`);
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to update status');
+      }
+    } catch (err) {
+      setError('An error occurred while updating the status');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const handleDelete = async (slug: string) => {
     if (!confirm('Are you sure you want to delete this newsletter subscription?')) {
       return;
@@ -52,6 +99,9 @@ const NewsletterPage: React.FC = () => {
       if (response.ok) {
         setSubscriptions(subscriptions.filter(sub => sub.slug !== slug));
         setSuccess('Newsletter subscription deleted successfully');
+        if (viewingDetail && selectedSubscription?.slug === slug) {
+          handleCancelDetail();
+        }
         setTimeout(() => setSuccess(''), 3000);
       } else {
         const data = await response.json();
@@ -86,6 +136,177 @@ const NewsletterPage: React.FC = () => {
     );
   }
 
+  // Detail View
+  if (viewingDetail && selectedSubscription) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={handleCancelDetail}
+            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Newsletter
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Subscription Details</h1>
+            <p className="text-gray-600 mt-1">
+              View and manage newsletter subscription
+            </p>
+          </div>
+        </div>
+
+        {/* Success and Error Messages */}
+        {success && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-3">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <div>
+              <p className="text-green-800 font-medium">Success</p>
+              <p className="text-green-700 text-sm">{success}</p>
+            </div>
+            <button
+              onClick={() => setSuccess('')}
+              className="ml-auto text-green-600 hover:text-green-800"
+            >
+              <XCircle className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3">
+            <XCircle className="h-5 w-5 text-red-600" />
+            <div>
+              <p className="text-red-800 font-medium">Error</p>
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+            <button
+              onClick={() => setError('')}
+              className="ml-auto text-red-600 hover:text-red-800"
+            >
+              <XCircle className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Subscription Information */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+              <div className="bg-gradient-to-r from-blue-50 to-white border-b border-gray-200 px-6 py-4">
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-6 w-6 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Subscription Information</h3>
+                  {getStatusBadge(selectedSubscription.status)}
+                </div>
+              </div>
+              <div className="p-6 pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium text-gray-500">Email Address</label>
+                    <a href={`mailto:${selectedSubscription.email}`} className="text-lg font-semibold text-blue-600 hover:underline block">
+                      {selectedSubscription.email}
+                    </a>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500">Subscription Status</label>
+                    <div className="flex items-center space-x-2">
+                      {getStatusBadge(selectedSubscription.status)}
+                      <span className="text-sm text-gray-600">
+                        {selectedSubscription.status === 'active' ? 'Currently receiving emails' : 'Not receiving emails'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500">Subscribed Date</label>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(selectedSubscription.subscribedAt).toLocaleString()}</span>
+                    </div>
+                  </div>
+                  {selectedSubscription.unsubscribedAt && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium text-gray-500">Unsubscribed Date</label>
+                      <div className="flex items-center space-x-2 text-gray-600">
+                        <Calendar className="h-4 w-4" />
+                        <span>{new Date(selectedSubscription.unsubscribedAt).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500">Subscription ID</label>
+                    <p className="text-sm font-mono text-gray-600 bg-gray-100 p-2 rounded">
+                      {selectedSubscription.slug}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions Sidebar */}
+          <div className="space-y-6">
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-900">Subscription Actions</h3>
+              </div>
+              <div className="p-6 space-y-3">
+                <button
+                  onClick={() => updateStatus('active')}
+                  disabled={updating || selectedSubscription.status === 'active'}
+                  className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 w-full justify-start"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Activate Subscription
+                </button>
+                <button
+                  onClick={() => updateStatus('inactive')}
+                  disabled={updating || selectedSubscription.status === 'inactive'}
+                  className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 w-full justify-start"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Deactivate Subscription
+                </button>
+                <button
+                  onClick={() => handleDelete(selectedSubscription.slug)}
+                  className="inline-flex items-center justify-center rounded-md border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 w-full justify-start"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Delete Subscription
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-900">Quick Actions</h3>
+              </div>
+              <div className="p-6 space-y-3">
+                <a href={`mailto:${selectedSubscription.email}`}>
+                  <button className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full justify-start">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send Email
+                  </button>
+                </a>
+                <button 
+                  onClick={fetchSubscriptions}
+                  className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 w-full justify-start"
+                  disabled={loading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // List View
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -239,11 +460,12 @@ const NewsletterPage: React.FC = () => {
                         </td>
                         <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
                           <div className="flex justify-end space-x-2">
-                            <Link href={`/admin/dashboard/newsletter/${subscription.slug}`}>
-                              <button className="inline-flex items-center justify-center rounded-md border border-blue-200 bg-white px-3 py-2 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                <Eye className="h-4 w-4" />
-                              </button>
-                            </Link>
+                            <button
+                              onClick={() => handleViewDetail(subscription)}
+                              className="inline-flex items-center justify-center rounded-md border border-blue-200 bg-white px-3 py-2 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
                             <button 
                               className="inline-flex items-center justify-center rounded-md border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
                               onClick={() => handleDelete(subscription.slug)}

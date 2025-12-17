@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
+import { verifyAdminAuth } from '@/lib/apiAuth';
 
 // POST: Public - Create new newsletter subscription
 export async function POST(request: NextRequest) {
@@ -107,9 +108,12 @@ export async function POST(request: NextRequest) {
 // GET: Admin - Fetch all newsletter subscriptions
 export async function GET(request: NextRequest) {
   try {
+    const auth = await verifyAdminAuth(request);
+    if (!auth.isValid) {
+      return auth.response;
+    }
+    
     await connectDB();
-
-    const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const status = searchParams.get('status');

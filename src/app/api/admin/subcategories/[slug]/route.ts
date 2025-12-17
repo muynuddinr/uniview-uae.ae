@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Subcategory from '@/models/Subcategory';
 import Product from '@/models/Product';
-import { verifyToken, getTokenCookie } from '@/lib/auth';
+import { verifyAdminAuth } from '@/lib/apiAuth';
 import { uploadImage, deleteImage } from '@/lib/cloudinary';
 
 // GET: Public - Fetch single subcategory with products
@@ -51,20 +51,9 @@ export async function PUT(
 ) {
   try {
     // Verify authentication
-    const token = getTokenCookie(request);
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid token' },
-        { status: 401 }
-      );
+    const auth = await verifyAdminAuth(request);
+    if (!auth.isValid) {
+      return auth.response;
     }
     
     const { slug } = await params;
@@ -147,20 +136,9 @@ export async function DELETE(
 ) {
   try {
     // Verify authentication
-    const token = getTokenCookie(request);
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid token' },
-        { status: 401 }
-      );
+    const auth = await verifyAdminAuth(request);
+    if (!auth.isValid) {
+      return auth.response;
     }
     
     const { slug } = await params;
