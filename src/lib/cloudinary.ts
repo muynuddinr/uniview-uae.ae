@@ -21,6 +21,12 @@ export const uploadImage = async (file: File, folder: string = 'general') => {
       unique_filename: true,
     });
     
+    console.log('Cloudinary upload result:', {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+      folder: folder
+    });
+    
     return {
       url: result.secure_url,
       publicId: result.public_id,

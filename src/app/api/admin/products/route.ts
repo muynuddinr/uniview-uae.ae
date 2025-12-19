@@ -97,8 +97,13 @@ export async function POST(request: NextRequest) {
     if (mainImageFile && mainImageFile.size > 0) {
       try {
         const uploadResult = await uploadImage(mainImageFile, 'products/main');
+        // Ensure we get the full secure URL
         mainImageUrl = uploadResult.url;
         mainImagePublicId = uploadResult.publicId;
+        
+        // Debug: Log the actual URL being stored
+        console.log('Main image uploaded - URL:', mainImageUrl);
+        console.log('Main image publicId:', mainImagePublicId);
       } catch (error) {
         console.error('Error uploading main image:', error);
         return NextResponse.json(

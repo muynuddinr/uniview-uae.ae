@@ -132,8 +132,13 @@ export async function PUT(
       }
       
       const uploadResult = await uploadImage(mainImageFile, 'products/main');
+      // Ensure we get the full secure URL
       product.mainImage = uploadResult.url;
       product.mainImagePublicId = uploadResult.publicId;
+      
+      // Debug: Log the actual URL being stored
+      console.log('Main image updated - URL:', product.mainImage);
+      console.log('Main image publicId:', product.mainImagePublicId);
     } else if (!keepCurrentMainImage) {
       if (product.mainImagePublicId) {
         await deleteImage(product.mainImagePublicId);
