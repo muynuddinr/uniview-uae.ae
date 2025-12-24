@@ -25,6 +25,15 @@ export async function GET(
       );
     }
     
+    // Generate slug if missing
+    if (!subcategory.slug && subcategory.name) {
+      subcategory.slug = subcategory.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      await subcategory.save();
+    }
+    
     // Get all products under this subcategory
     const products = await Product.find({ subcategoryId: subcategory._id })
       .select('name slug shortDescription mainImage price inStock')

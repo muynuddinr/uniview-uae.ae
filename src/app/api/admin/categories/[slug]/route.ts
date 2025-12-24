@@ -25,21 +25,23 @@ export async function GET(
       );
     }
     
+    // Generate slug if missing
+    if (!category.slug && category.name) {
+      category.slug = category.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      await category.save();
+    }
+    
     const subcategories = await Subcategory.find({ categoryId: category._id })
       .select('name slug description image')
       .sort({ name: 1 });
     
-    let products: any[] = [];
-    
-    // Only fetch products if category has NO subcategories
-    if (subcategories.length === 0) {
-      products = await Product.find({ 
-        categoryId: category._id,
-        subcategoryId: { $exists: false }
-      })
+    // Always fetch products under this category, regardless of subcategories
+    const products = await Product.find({ categoryId: category._id })
       .select('name slug shortDescription mainImage price inStock')
       .sort({ createdAt: -1 });
-    }
     
     return NextResponse.json({
       success: true,

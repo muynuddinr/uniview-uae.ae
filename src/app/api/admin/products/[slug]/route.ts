@@ -26,6 +26,15 @@ export async function GET(
       );
     }
     
+    // Generate slug if missing
+    if (!product.slug && product.name) {
+      product.slug = product.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      await product.save();
+    }
+    
     return NextResponse.json({ 
       success: true,
       product

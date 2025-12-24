@@ -9,17 +9,27 @@ export async function GET(request: NextRequest) {
     await connectDB();
     
     const categories = await Category.find({})
-      .populate({
-        path: 'subcategories',
-        model: Subcategory,
-        select: 'name slug'
-      })
-      .select('name slug subcategories')
+      .select('name slug')
       .sort({ name: 1 });
     
+    // Manually fetch subcategories for each category
+    const categoriesWithSubcategories = await Promise.all(
+      categories.map(async (category) => {
+        const subcategories = await Subcategory.find({ categoryId: category._id })
+          .select('name slug')
+          .sort({ name: 1 });
+        
+        return {
+          ...category.toJSON(),
+          subcategories
+        };
+      })
+    );
+    
+    console.log('Navbar categories fetched:', categoriesWithSubcategories.length);
     return NextResponse.json({
       success: true,
-      categories,
+      categories: categoriesWithSubcategories,
     });
   } catch (error) {
     console.error('Error fetching navbar data:', error);
