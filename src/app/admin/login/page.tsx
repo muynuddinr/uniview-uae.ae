@@ -24,18 +24,19 @@ const LoginPage: React.FC = () => {
           <LoginForm />
         </div>
 
-        {/* Footer */}
-        {/* <div className="text-center">
+        {/* /* {/* Footer */}
+        <div className="text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
             <Link href="/admin/register" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
               Create one here
             </Link>
           </p>
-        </div> */}
+        </div>
       </div>
     </div>
   );
 };
+
 
 export default LoginPage;
