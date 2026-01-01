@@ -13,17 +13,6 @@ export async function GET(request: NextRequest) {
     
     const categories = await Category.find({}).sort({ name: 1 });
     
-    // Generate slugs if missing
-    for (const category of categories) {
-      if (!category.slug && category.name) {
-        category.slug = category.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-        await category.save();
-      }
-    }
-    
     // Fetch subcategories for each category
     const categoriesWithSubcategories = await Promise.all(
       categories.map(async (category) => {

@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
           <LoginForm />
         </div>
 
-        {/* /* {/* Footer */}
+        {/* Footer */}
         {/* <div className="text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
@@ -37,6 +37,5 @@ const LoginPage: React.FC = () => {
     </div>
   );
 };
-
 
 export default LoginPage;

@@ -19,17 +19,6 @@ export async function GET(request: NextRequest) {
       .populate('categoryId', 'name slug image')
       .populate('subcategoryId', 'name slug image')
       .sort({ createdAt: -1 });
-    
-    // Generate slugs if missing
-    for (const product of products) {
-      if (!product.slug && product.name) {
-        product.slug = product.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-        await product.save();
-      }
-    }
 
     return NextResponse.json({
       success: true,

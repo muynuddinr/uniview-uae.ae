@@ -22,17 +22,6 @@ export async function GET(request: NextRequest) {
       .populate('categoryId', 'name slug')
       .sort({ name: 1 });
     
-    // Generate slugs if missing
-    for (const subcategory of subcategories) {
-      if (!subcategory.slug && subcategory.name) {
-        subcategory.slug = subcategory.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-        await subcategory.save();
-      }
-    }
-    
     return NextResponse.json({
       success: true,
       subcategories,

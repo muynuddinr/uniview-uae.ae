@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import Logo from '@/assets/Uniview-Logoxmas.png';
+import Logo from '@/assets/Uniview-Logo.png';
 
 // Simplified types
 interface Subcategory {

@@ -211,17 +211,6 @@ export default async function ProductsPage({ params }: PageProps) {
                 type="subcategories"
                 showCount={true}
               />
-              {products && products.length > 0 && (
-                <>
-                  <div className="mt-12">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Products in {category.name}</h2>
-                    <ProductsGrid
-                      products={products}
-                      baseHref={`/products/${category.slug}`}
-                    />
-                  </div>
-                </>
-              )}
             </div>
           </div>
           <Footer />
